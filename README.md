@@ -118,10 +118,38 @@ npm start       # servir o build
 
 ## Deploy
 
-O projeto é uma aplicação Next.js padrão. Na Vercel: importe o repositório,
-defina o diretório raiz como `chicao-car`, configure as variáveis de ambiente e
-faça o deploy. Qualquer plataforma com suporte a Node 20+ também funciona
-(`npm run build && npm start`).
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdelamata%2Fchicao_car&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=Credenciais%20do%20projeto%20Supabase%20(Settings%20%E2%86%92%20API)&project-name=chicao-car&repository-name=chicao-car)
+
+O projeto é uma aplicação Next.js padrão — qualquer plataforma com Node 20+
+serve (`npm ci && npm run build && npm start`). Na Vercel:
+
+1. **Importe o repositório** (ou use o botão acima). O `vercel.json` já define o
+   framework e a região `gru1` (São Paulo), para deixar as rotas de servidor
+   perto de quem usa.
+2. **Configure as variáveis** em Settings → Environment Variables:
+   `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   (e, se for usar envio de e-mail, `RESEND_API_KEY` e `EMAIL_FROM`).
+   Marque Production, Preview e Development.
+3. **Rode as migrations** do Supabase antes do primeiro acesso — sem elas as
+   consultas falham. Veja *Configuração do Supabase* acima.
+4. **Redeploy** após configurar as variáveis: as `NEXT_PUBLIC_*` entram no
+   bundle em tempo de build, então um deploy feito antes delas continua em modo
+   demonstração.
+5. Em Authentication → URL Configuration, aponte o **Site URL** do Supabase para
+   o domínio publicado, para que o link de redefinição de senha funcione.
+
+O build **não exige** as credenciais: sem elas a aplicação sobe em modo
+demonstração. Isso é proposital — permite publicar e validar o ambiente antes de
+ligar o banco —, mas **não deixe assim em produção**: sem Supabase os dados
+vivem só no navegador de cada pessoa.
+
+### Segurança em repositório público
+
+Este repositório é público e não contém segredos: `.env.local` está no
+`.gitignore` e apenas o `.env.example` é versionado. A chave `anon` do Supabase é
+pública por definição — quem protege os dados são as políticas de RLS em
+`supabase/migrations/0002_rls.sql`. A chave `service_role` não pode aparecer no
+frontend nem em variáveis `NEXT_PUBLIC_*`.
 
 ## Estrutura
 
